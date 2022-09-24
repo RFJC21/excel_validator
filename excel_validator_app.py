@@ -11,7 +11,17 @@ warnings.filterwarnings("ignore")
 
 # App
 def main():
+    st.set_page_config(layout="wide")
+
     st.title('Excel Validator')
+
+    st.info('**Information**')
+    st.write('* You have to import excel files with "xlsx" format')
+    st.write("* Select the button  'Select Excel Files' and chose the file you want")
+    st.write('* Select the sheet you want to compare')
+    st.write("* Change the starting row if your sheet doesn't start in the first row")
+    st.write("* Select the button 'Compare Excels' to validate the files")
+    st.write('##')
 
     # Get excel files
     if st.checkbox('Select Excel Files', key=1):
@@ -35,9 +45,12 @@ def main():
                 #st.json(file_details, expanded=False)
                 st.markdown("----")
 
+                # Skip Rows
+                skip_rows_df_1 = st.number_input('Header Starting Row:', 0,100,1, key = 3)
+
                 # Select sheet
                 sheet_selector = st.selectbox("Select sheet:", wb.sheetnames, key='a')
-                df_1 = pd.read_excel(file_1, sheet_selector)
+                df_1 = pd.read_excel(file_1, sheet_selector, skiprows = skip_rows_df_1 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
                 st.write(df_1)
@@ -72,9 +85,12 @@ def main():
                 #st.json(file_details, expanded=False)
                 st.markdown("----")
 
+                # Skip Rows
+                skip_rows_df_2 = st.number_input('Header Starting Row:', 0, 100, 1, key = 4)
+
                 # Select sheet
                 sheet_selector = st.selectbox("Select sheet:", wb.sheetnames, key='b')
-                df_2 = pd.read_excel(file_2, sheet_selector)
+                df_2 = pd.read_excel(file_2, sheet_selector, skiprows = skip_rows_df_2 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
                 st.write(df_2)
@@ -95,9 +111,10 @@ def main():
 
     ## Comparison
     # SUM
+    st.write('##')
     if st.checkbox('Compare Excels', key=2):
         sum = 'SUM'
-        st.subheader(f"### Validation: `{sum}`")
+        st.subheader(f"Validation: `{sum}`")
 
 
         # Series to Dataframe
@@ -107,21 +124,27 @@ def main():
 
             # Compare
             df_compare_sum =df_1_sum.compare(df_2_sum, align_axis=0)
-            st.write('*self -> HAMS; other -> DWH*')
+            st.write('self: **HAMS**; other: **DWH**')
             st.dataframe(df_compare_sum)
 
             # Dif between sheets
-            st.markdown('#### Diference between sheets')
+            #st.markdown('#### Diference between sheets')
             df_dif_sum = df_compare_sum.diff()
-            st.dataframe(df_dif_sum)
+            #st.dataframe(df_dif_sum)
 
             st.write("##")
         except:
             st.error('Sheets with different formats')
 
+            cols_df_1 = len(df_1.axes[1])
+            cols_df_2 = len(df_2.axes[1])
+
+            # Number of Columns
+            st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
+
         # Count
         count = 'COUNT'
-        st.subheader(f"### Validation: `{count}`")
+        st.subheader(f"Validation: `{count}`")
 
         # Series to Dataframe
         try:
@@ -130,20 +153,28 @@ def main():
 
             # Compare
             df_compare_count = df_1_count.compare(df_2_count, align_axis=0)
-            st.write('*self -> HAMS; other -> DWH*')
+            st.write('self: **HAMS**; other: **DWH**')
+
             st.dataframe(df_compare_count)
 
             # Dif between sheets
-            st.markdown('#### Diference between sheets')
+            st.write('##')
+            st.write('##')
+
+            #st.markdown('#### **Diference between sheets**')
             df_dif_count = df_compare_count.diff()
-            st.dataframe(df_dif_count)
+            #st.dataframe(df_dif_count)
 
         except:
             st.error('Sheets with different formats')
 
+            cols_df_1 = len(df_1.axes[1])
+            cols_df_2 = len(df_2.axes[1])
+
+            # Number of Columns
+            st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
 
         ## Final Validation
-        st.write("##")
 
         # Final Dataframe
         #df_dif_sum = df_dif_sum.rename(index={2: "SUM"})
@@ -153,6 +184,10 @@ def main():
         #df_validation = pd.append([df_dif_sum, df_dif_count], axis=1)
         df_validation = df_dif_sum.append(df_dif_count)
         #df_validation.rename(index={0: "SUM", 1: "COUNT"})
+
+        # Diference between sheets
+        new_title = '<p style="font-family:Arial; color:#008080; font-size: 35px;">Diference between Sheets</p>'
+        st.markdown(new_title, unsafe_allow_html=True)
         st.dataframe(df_validation)
 
         st.info('**Validation Status**')
