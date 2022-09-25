@@ -172,7 +172,6 @@ soupsieve==2.3.2.post1
 stack-data==0.2.0
 starlette==0.19.1
 streamlit==1.12.2
-streamlit-aggrid==0.3.3
 tangled-up-in-unicode==0.1.0
 tenacity==8.0.1
 termcolor==1.1.0
