@@ -69,7 +69,8 @@ def main():
                        enable_enterprise_modules=True,
                        height=500,
                        width='100%',
-                       reload_data=True)
+                       reload_data=True,
+                       key='first')
 
                 # SUM
                 st.write("##")
@@ -123,7 +124,8 @@ def main():
                        enable_enterprise_modules=True,
                        height=500,
                        width='100%',
-                       reload_data=True)
+                       reload_data=True,
+                       key='second')
 
                 # SUM
                 st.write("##")
