@@ -6,6 +6,8 @@ import warnings
 import openpyxl as op
 from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
+from st_aggrid import AgGrid
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 
 warnings.filterwarnings("ignore")
 
@@ -53,7 +55,21 @@ def main():
                 df_1 = pd.read_excel(file_1, sheet_selector, skiprows = skip_rows_df_1 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
-                st.write(df_1)
+
+                gb = GridOptionsBuilder.from_dataframe(df_1)
+                gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
+                gb.configure_side_bar()  # Add a sidebar
+                gridOptions = gb.build()
+                AgGrid(df_1,
+                       gridOptions=gridOptions,
+                       data_return_mode='AS_INPUT',
+                       update_mode='MODEL_CHANGED',
+                       fit_columns_on_grid_load=False,
+                       theme='streamlit',
+                       enable_enterprise_modules=True,
+                       height=500,
+                       width='100%',
+                       reload_data=True)
 
                 # SUM
                 st.write("##")
@@ -93,7 +109,21 @@ def main():
                 df_2 = pd.read_excel(file_2, sheet_selector, skiprows = skip_rows_df_2 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
-                st.write(df_2)
+
+                gb2 = GridOptionsBuilder.from_dataframe(df_2)
+                gb2.configure_pagination(paginationAutoPageSize=True)  # Add pagination
+                gb2.configure_side_bar()  # Add a sidebar
+                gridOptions = gb2.build()
+                AgGrid(df_2,
+                       gridOptions=gridOptions,
+                       data_return_mode='AS_INPUT',
+                       update_mode='MODEL_CHANGED',
+                       fit_columns_on_grid_load=False,
+                       theme='streamlit',
+                       enable_enterprise_modules=True,
+                       height=500,
+                       width='100%',
+                       reload_data=True)
 
                 # SUM
                 st.write("##")
