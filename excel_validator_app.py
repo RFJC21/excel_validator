@@ -6,6 +6,8 @@ import warnings
 import openpyxl as op
 from io import BytesIO
 from pyxlsb import open_workbook as open_xlsb
+from st_aggrid import AgGrid
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode
 
 warnings.filterwarnings("ignore")
 
@@ -53,6 +55,22 @@ def main():
                 df_1 = pd.read_excel(file_1, sheet_selector, skiprows = skip_rows_df_1 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
+
+                comment='''gb = GridOptionsBuilder.from_dataframe(df_1)
+                gb.configure_pagination(paginationAutoPageSize=True)  # Add pagination
+                gb.configure_side_bar()  # Add a sidebar
+                gridOptions = gb.build()
+                AgGrid(df_1,
+                       gridOptions=gridOptions,
+                       data_return_mode='AS_INPUT',
+                       update_mode='MODEL_CHANGED',
+                       fit_columns_on_grid_load=False,
+                       theme='streamlit',
+                       enable_enterprise_modules=True,
+                       height=500,
+                       width='100%',
+                       reload_data=True)'''
+
                 st.dataframe(df_1)
 
                 # SUM
@@ -93,6 +111,22 @@ def main():
                 df_2 = pd.read_excel(file_2, sheet_selector, skiprows = skip_rows_df_2 - 1)
                 st.write("##")
                 st.markdown(f"### Currently Selected: `{sheet_selector}`")
+
+                comment='''gb2 = GridOptionsBuilder.from_dataframe(df_2)
+                gb2.configure_pagination(paginationAutoPageSize=True)  # Add pagination
+                gb2.configure_side_bar()  # Add a sidebar
+                gridOptions = gb2.build()
+                AgGrid(df_2,
+                       gridOptions=gridOptions,
+                       data_return_mode='AS_INPUT',
+                       update_mode='MODEL_CHANGED',
+                       fit_columns_on_grid_load=False,
+                       theme='streamlit',
+                       enable_enterprise_modules=True,
+                       height=500,
+                       width='100%',
+                       reload_data=True)'''
+
                 st.dataframe(df_2)
 
                 # SUM
@@ -123,13 +157,23 @@ def main():
             df_2_sum = df_2_sum.to_frame()
 
             # Compare
-            df_compare_sum =df_1_sum.compare(df_2_sum, align_axis=0)
-            st.write('self: **HAMS**; other: **DWH**')
+            #df_compare_sum =df_1_sum.compare(df_2_sum, align_axis=0)
+            st.write('**HAMS**')
+            st.dataframe(df_1_sum)
+
+            st.write('**DWH**')
+            st.dataframe(df_2_sum)
+
+            df_compare_sum = df_1_sum - df_2_sum
+
+            st.write('**Diference**')
             st.dataframe(df_compare_sum)
+            #st.dataframe(df_compare_sum)
 
             # Dif between sheets
             #st.markdown('#### Diference between sheets')
-            df_dif_sum = df_compare_sum.diff()
+            #df_dif_sum = df_compare_sum.diff()
+            df_dif_sum = df_compare_sum.sum()
             #st.dataframe(df_dif_sum)
 
             st.write("##")
@@ -152,9 +196,17 @@ def main():
             df_2_count = df_2_count.to_frame()
 
             # Compare
-            df_compare_count = df_1_count.compare(df_2_count, align_axis=0)
-            st.write('self: **HAMS**; other: **DWH**')
+            #df_compare_count = df_1_count.compare(df_2_count, align_axis=0)
 
+            st.write('**HAMS**')
+            st.dataframe(df_1_count)
+
+            st.write('**DWH**')
+            st.dataframe(df_2_count)
+
+            df_compare_count = df_1_count - df_2_count
+
+            st.write('**Diference**')
             st.dataframe(df_compare_count)
 
             # Dif between sheets
@@ -162,7 +214,8 @@ def main():
             st.write('##')
 
             #st.markdown('#### **Diference between sheets**')
-            df_dif_count = df_compare_count.diff()
+            #df_dif_count = df_compare_count.diff()
+            df_dif_count = df_compare_count.sum()
             #st.dataframe(df_dif_count)
 
         except:
@@ -183,15 +236,16 @@ def main():
 
         #df_validation = pd.append([df_dif_sum, df_dif_count], axis=1)
         df_validation = df_dif_sum.append(df_dif_count)
+        #df_validation = df_dif_sum - df_dif_count
         #df_validation.rename(index={0: "SUM", 1: "COUNT"})
 
         # Diference between sheets
         new_title = '<p style="font-family:Arial; color:#008080; font-size: 35px;">Diference between Sheets</p>'
         st.markdown(new_title, unsafe_allow_html=True)
-        st.dataframe(df_validation)
+        st.dataframe(df_validation, width = 100)
 
         st.info('**Validation Status**')
-        if df_dif_sum.empty & df_dif_count.empty:
+        if df_validation.sum() < 1:
             st.success('**Sheet Validated!**')
         else:
             st.error('**Sheet Not Validated!**')
@@ -218,6 +272,8 @@ def main():
     # warning caso formato seja diferente -> ta
     # mensagem sucesso -> ta
     # download file with 2 validation dataframes -> ta
+
+    # df_unique = df.nunique().to_frame().reset_index()
 
 if __name__ == '__main__':
     main()
