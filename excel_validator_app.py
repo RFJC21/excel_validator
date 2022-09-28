@@ -18,6 +18,7 @@ def main():
     st.title('Excel Validator')
 
     st.info('**Information**')
+    st.write('* **This app validates the number of columns, sum of numerical columns, count of rows and distinct categorical values**')
     st.write('* You have to import excel files with "xlsx" format')
     st.write("* Select the button  'Select Excel Files' and chose the file you want")
     st.write('* Select the sheet you want to compare')
@@ -150,7 +151,7 @@ def main():
         sum = 'SUM'
         cols = 'COLUMNS'
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             st.subheader(f"Validation: `{cols}`")
@@ -248,6 +249,25 @@ def main():
                 # Number of Columns
                 st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
 
+
+        with col4:
+            # Count
+            distinct = 'DISTINCT'
+            st.subheader(f"Validation: `{distinct}`")
+
+            st.write('**HAMS**')
+            df_1_distinct = df_1.nunique(dropna=False).sum()
+            st.write(f'{df_1_distinct} distinct categorical values')
+            st.write(df_1.nunique().to_frame().reset_index())
+
+            st.write('**DWH**')
+            df_2_distinct = df_2.nunique(dropna=False).sum()
+            st.write(f'{df_2_distinct} distinct categorical values')
+            st.write(df_2.nunique().to_frame().reset_index())
+
+            st.write('**Diference**')
+            st.dataframe(df_1.nunique(dropna=False) - df_2.nunique(dropna=False))
+
         ## Final Validation
 
         # Final Dataframe
@@ -269,32 +289,43 @@ def main():
         #df_compare_sum = df_compare_sum.dropna()
         #df_compare_count = df_compare_count.dropna()
 
+        validation_columns = cols_df_1 == cols_df_2
+        validation_distinct = df_1_distinct == df_2_distinct
+
         # Check SUM
-        if df_compare_sum.all().sum() > 0 :
+        if df_compare_sum.any().sum() > 0 :
             st.write('**SUM NOK**')
         else:
             st.write('**SUM OK**')
 
         # Check COUNT
-        if df_compare_count.all().sum() > 0:
+        if df_compare_count.any().sum() > 0:
             st.write('**COUNT NOK**')
         else:
             st.write('**COUNT OK**')
 
         # Check COLUMNS
-        if cols_df_1 == cols_df_2:
+        if validation_columns == True:
             st.write('**COLUMNS OK**')
         else:
             st.write('**COLUMNS NOK**')
 
-        if df_compare_sum.all().sum() == 0 and df_compare_count.all().sum() == 0 and cols_df_1 == cols_df_2:
-            st.success('**Sheet Validated!**')
+        # Check DISTINCT CATEGORICAL VALUES
+        if df_1_distinct == df_2_distinct:
+            st.write('**DISTINCT CATEGORICAL OK**')
         else:
+            st.write('**DISTINCT CATEGORICAL NOK**')
+
+        # Final Check
+        st.write('##')
+        if df_compare_sum.any().sum() > 0 or df_compare_count.any().sum() > 0 or validation_columns == False or validation_distinct == False:
             st.error('**Sheet Not Validated!**')
+        else:
+            st.success('**Sheet Validated!**')
 
         st.write("##")
         st.subheader('Download validation results')
-        st.download_button(label='📥 Download Excel', data=df_validation.to_csv(), mime='text/csv')
+        #st.download_button(label='📥 Download Excel', data=df_validation.to_csv(), mime='text/csv')
 
         comment_download_excel='''def to_excel(df):
             output = BytesIO()
@@ -311,11 +342,9 @@ def main():
                            data=df_xlsx,
                            file_name='df_test.xlsx')'''
 
-    # warning caso formato seja diferente -> ta
-    # mensagem sucesso -> ta
-    # download file with 2 validation dataframes -> ta
 
-    # df_unique = df.nunique().to_frame().reset_index()
+        df_download = df_compare_sum.append(df_compare_count)
+        st.download_button(label='📥 Download Excel', data=df_download.to_csv(), mime='text/csv')
 
 if __name__ == '__main__':
     main()
