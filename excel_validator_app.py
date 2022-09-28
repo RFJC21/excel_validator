@@ -148,84 +148,105 @@ def main():
     st.write('##')
     if st.checkbox('Compare Excels', key=2):
         sum = 'SUM'
-        st.subheader(f"Validation: `{sum}`")
+        cols = 'COLUMNS'
 
+        col1, col2, col3 = st.columns(3)
 
-        # Series to Dataframe
-        try:
-            df_1_sum = df_1_sum.to_frame()
-            df_2_sum = df_2_sum.to_frame()
-
-            # Compare
-            #df_compare_sum =df_1_sum.compare(df_2_sum, align_axis=0)
-            st.write('**HAMS**')
-            st.dataframe(df_1_sum)
-
-            st.write('**DWH**')
-            st.dataframe(df_2_sum)
-
-            df_compare_sum = df_1_sum - df_2_sum
-
-            st.write('**Diference**')
-            st.dataframe(df_compare_sum)
-            #st.dataframe(df_compare_sum)
-
-            # Dif between sheets
-            #st.markdown('#### Diference between sheets')
-            #df_dif_sum = df_compare_sum.diff()
-            df_dif_sum = df_compare_sum.sum()
-            #st.dataframe(df_dif_sum)
-
-            st.write("##")
-        except:
-            st.error('Sheets with different formats')
-
+        with col1:
+            st.subheader(f"Validation: `{cols}`")
             cols_df_1 = len(df_1.axes[1])
             cols_df_2 = len(df_2.axes[1])
 
-            # Number of Columns
-            st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
-
-        # Count
-        count = 'COUNT'
-        st.subheader(f"Validation: `{count}`")
-
-        # Series to Dataframe
-        try:
-            df_1_count = df_1_count.to_frame()
-            df_2_count = df_2_count.to_frame()
-
-            # Compare
-            #df_compare_count = df_1_count.compare(df_2_count, align_axis=0)
-
             st.write('**HAMS**')
-            st.dataframe(df_1_count)
+            st.text(f'{cols_df_1} columns')
 
             st.write('**DWH**')
-            st.dataframe(df_2_count)
+            st.text(f'{cols_df_2} columns')
 
-            df_compare_count = df_1_count - df_2_count
-
-            st.write('**Diference**')
-            st.dataframe(df_compare_count)
-
-            # Dif between sheets
-            st.write('##')
             st.write('##')
 
-            #st.markdown('#### **Diference between sheets**')
-            #df_dif_count = df_compare_count.diff()
-            df_dif_count = df_compare_count.sum()
-            #st.dataframe(df_dif_count)
+        with col2:
+            st.subheader(f"Validation: `{sum}`")
 
-        except:
-            st.error('Sheets with different formats')
+            #df_unique = df_1.nunique().to_frame().reset_index()
+            #st.dataframe(df_unique)
 
-            cols_df_1 = len(df_1.axes[1])
-            cols_df_2 = len(df_2.axes[1])
+            # Series to Dataframe
+            try:
+                df_1_sum = df_1_sum.to_frame()
+                df_2_sum = df_2_sum.to_frame()
 
-            # Number of Columns
-            st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
+                # Compare
+                #df_compare_sum =df_1_sum.compare(df_2_sum, align_axis=0)
+                st.write('**HAMS**')
+                st.dataframe(df_1_sum)
+
+                st.write('**DWH**')
+                st.dataframe(df_2_sum)
+
+                df_compare_sum = df_1_sum - df_2_sum
+
+                st.write('**Diference**')
+                st.dataframe(df_compare_sum)
+                #st.dataframe(df_compare_sum)
+
+                # Dif between sheets
+                #st.markdown('#### Diference between sheets')
+                #df_dif_sum = df_compare_sum.diff()
+                df_dif_sum = df_compare_sum.sum()
+                #st.dataframe(df_dif_sum)
+
+                st.write("##")
+            except:
+                st.error('Sheets with different formats')
+
+                cols_df_1 = len(df_1.axes[1])
+                cols_df_2 = len(df_2.axes[1])
+
+                # Number of Columns
+                st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
+
+        with col3:
+            # Count
+            count = 'COUNT'
+            st.subheader(f"Validation: `{count}`")
+
+            # Series to Dataframe
+            try:
+                df_1_count = df_1_count.to_frame()
+                df_2_count = df_2_count.to_frame()
+
+                # Compare
+                #df_compare_count = df_1_count.compare(df_2_count, align_axis=0)
+
+                st.write('**HAMS**')
+                st.dataframe(df_1_count)
+
+                st.write('**DWH**')
+                st.dataframe(df_2_count)
+
+                df_compare_count = df_1_count - df_2_count
+
+                st.write('**Diference**')
+                st.dataframe(df_compare_count)
+
+                # Dif between sheets
+                st.write('##')
+                st.write('##')
+
+                #st.markdown('#### **Diference between sheets**')
+                #df_dif_count = df_compare_count.diff()
+                df_dif_count = df_compare_count.sum()
+                #st.dataframe(df_dif_count)
+
+            except:
+                st.error('Sheets with different formats')
+
+                cols_df_1 = len(df_1.axes[1])
+                cols_df_2 = len(df_2.axes[1])
+
+                # Number of Columns
+                st.write(f'First file has **{cols_df_1}** columns and second file has **{cols_df_2}** columns')
 
         ## Final Validation
 
@@ -242,10 +263,31 @@ def main():
         # Diference between sheets
         new_title = '<p style="font-family:Arial; color:#008080; font-size: 35px;">Diference between Sheets</p>'
         st.markdown(new_title, unsafe_allow_html=True)
-        st.dataframe(df_validation, width = 100)
+        #st.dataframe(df_validation, width = 100)
 
-        st.info('**Validation Status**')
-        if df_validation.sum() < 1:
+        # Drop NaN values (extra columns)
+        #df_compare_sum = df_compare_sum.dropna()
+        #df_compare_count = df_compare_count.dropna()
+
+        # Check SUM
+        if df_compare_sum.all().sum() > 0 :
+            st.write('**SUM NOK**')
+        else:
+            st.write('**SUM OK**')
+
+        # Check COUNT
+        if df_compare_count.all().sum() > 0:
+            st.write('**COUNT NOK**')
+        else:
+            st.write('**COUNT OK**')
+
+        # Check COLUMNS
+        if cols_df_1 == cols_df_2:
+            st.write('**COLUMNS OK**')
+        else:
+            st.write('**COLUMNS NOK**')
+
+        if df_compare_sum.all().sum() == 0 and df_compare_count.all().sum() == 0 and cols_df_1 == cols_df_2:
             st.success('**Sheet Validated!**')
         else:
             st.error('**Sheet Not Validated!**')
